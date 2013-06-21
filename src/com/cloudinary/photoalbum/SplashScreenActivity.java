@@ -19,6 +19,12 @@ import com.nostra13.universalimageloader.utils.L;
  * @see SystemUiHider
  */
 public class SplashScreenActivity extends Activity {
+	private static final int REQUEST_DEFAULT = 1;
+	/**
+	 * The next activity to fire
+	 */
+	private Class<?> nextActivity = LoginActivity.class;
+
 	private static final int SPLASH_SCREEN_TIMEOUT = 1000;
 	/**
 	 * Whether or not the system UI should be auto-hidden after
@@ -120,24 +126,32 @@ public class SplashScreenActivity extends Activity {
 		findViewById(R.id.dummy_button).setOnTouchListener(
 				mDelayHideTouchListener);
 		
+	}
+
+	@Override
+	protected void onResume() {
+		super.onResume();
+		scheduleRedirect();
+	}
+
+	private void scheduleRedirect() {
 		// Calls login activity after splash screen timeout
 		final Activity current = this;
 		L.i("Running");
 		new Handler().postDelayed(new Runnable() {
 			public void run() {
-				L.i("Calling new intent");
-				Intent intent = new Intent(current, LoginActivity.class);
-				startActivityForResult(intent, LoginActivity.REQUEST_LOGIN);
+				L.i("Calling new intent - %s", nextActivity.toString());
+				Intent intent = new Intent(current, nextActivity);
+				startActivityForResult(intent, REQUEST_DEFAULT);
 			}
 		}, SPLASH_SCREEN_TIMEOUT);
 	}
 	
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		L.d("SplashScreenActivity - %d %d", requestCode, resultCode);
-		if (requestCode == LoginActivity.REQUEST_LOGIN) {
+		if (requestCode == REQUEST_DEFAULT) {
 			if (resultCode == RESULT_OK) {
-				Intent intent = new Intent(this, ListPhotosActivity.class);
-				startActivity(intent);
+				nextActivity = ListPhotosActivity.class;
 			}
 		}
 	}

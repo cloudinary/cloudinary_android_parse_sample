@@ -27,8 +27,6 @@ import com.parse.ParseUser;
  * well.
  */
 public class LoginActivity extends Activity {
-	public static final int REQUEST_LOGIN = 1;
-
 	/**
 	 * Keep track of the login task to ensure we can cancel it if requested.
 	 */

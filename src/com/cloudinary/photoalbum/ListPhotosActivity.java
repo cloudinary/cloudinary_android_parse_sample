@@ -9,7 +9,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AbsListView;
 import android.widget.BaseAdapter;
 import android.widget.GridView;
 import android.widget.ImageView;
@@ -23,10 +22,11 @@ import com.parse.ParseObject;
 import com.parse.ParseQuery;
 
 public class ListPhotosActivity extends Activity {
-	private Cloudinary cloudinary;
+	protected Cloudinary cloudinary;
 	protected ImageLoader imageLoader = ImageLoader.getInstance();
-	DisplayImageOptions options;
-	AbsListView listView;
+	protected DisplayImageOptions options;
+	protected ParseImageAdapter adapter;
+	protected GridView listView;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -34,7 +34,14 @@ public class ListPhotosActivity extends Activity {
 		cloudinary = PhotoAlbumApplication.getInstance(this).getCloudinary();
 		setContentView(R.layout.activity_list_photos);
 		listView = (GridView) findViewById(R.id.gridView1);
-		((GridView) listView).setAdapter(new ParseImageAdapter());
+		adapter = new ParseImageAdapter();
+		listView.setAdapter(adapter);
+	}
+
+	@Override
+	protected void onResume() {
+		super.onResume();
+		adapter.clearCache();
 	}
 
 	@Override
@@ -81,12 +88,19 @@ public class ListPhotosActivity extends Activity {
 			return url;
 		}
 
+		private void clearCache() {
+			L.i("Clearing cache. Cache policy: %s", query.getCachePolicy().toString());
+			cache = null;
+			query.clearCachedResult();
+			notifyDataSetChanged();
+		}
+
 		@Override
 		public int getCount() {
 			try {
 				int count;
 				L.i("Counting");
-				count = ParseQuery.getQuery("Photo").count();
+				count = query.count();
 				L.i("Done: %d", count);
 				return count;
 			} catch (ParseException e) {
