@@ -18,7 +18,8 @@ import com.nostra13.universalimageloader.utils.L;
  * 
  * @see SystemUiHider
  */
-public class FullscreenActivity extends Activity {
+public class SplashScreenActivity extends Activity {
+	private static final int SPLASH_SCREEN_TIMEOUT = 1000;
 	/**
 	 * Whether or not the system UI should be auto-hidden after
 	 * {@link #AUTO_HIDE_DELAY_MILLIS} milliseconds.
@@ -126,9 +127,19 @@ public class FullscreenActivity extends Activity {
 			public void run() {
 				L.i("Calling new intent");
 				Intent intent = new Intent(current, LoginActivity.class);
+				startActivityForResult(intent, LoginActivity.REQUEST_LOGIN);
+			}
+		}, SPLASH_SCREEN_TIMEOUT);
+	}
+	
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		L.d("SplashScreenActivity - %d %d", requestCode, resultCode);
+		if (requestCode == LoginActivity.REQUEST_LOGIN) {
+			if (resultCode == RESULT_OK) {
+				Intent intent = new Intent(this, ListPhotosActivity.class);
 				startActivity(intent);
 			}
-		}, 5000);
+		}
 	}
 
 	@Override

@@ -12,12 +12,13 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
     <application
+        android:name="com.cloudinary.photoalbum.PhotoAlbumApplication"
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
-        android:theme="@style/AppTheme" android:name="PhotoAlbumApplication">
+        android:theme="@style/AppTheme" >
         <activity
-            android:name="com.cloudinary.photoalbum.FullscreenActivity"
+            android:name="com.cloudinary.photoalbum.SplashScreenActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:label="@string/app_name"
             android:theme="@style/FullscreenTheme" >
@@ -30,7 +31,7 @@
         <activity
             android:name="com.cloudinary.photoalbum.LoginActivity"
             android:label="@string/title_activity_login"
-            android:parentActivityName="com.cloudinary.photoalbum.FullscreenActivity"
+            android:parentActivityName="com.cloudinary.photoalbum.SplashScreenActivity"
             android:windowSoftInputMode="adjustResize|stateVisible" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
@@ -39,6 +40,14 @@
         <activity
             android:name="com.cloudinary.photoalbum.ListPhotosActivity"
             android:label="@string/title_activity_list_photos" >
+        </activity>
+        <activity
+            android:name="com.cloudinary.photoalbum.UploadPhotoActivity"
+            android:label="@string/title_activity_upload_photo"
+            android:parentActivityName="com.cloudinary.photoalbum.ListPhotosActivity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.cloudinary.photoalbum.ListPhotosActivity" />
         </activity>
     </application>
 

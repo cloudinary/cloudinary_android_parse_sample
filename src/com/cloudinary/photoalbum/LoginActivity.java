@@ -27,22 +27,19 @@ import com.parse.ParseUser;
  * well.
  */
 public class LoginActivity extends Activity {
-	/**
-	 * The default email to populate the email field with.
-	 */
-	public static final String EXTRA_EMAIL = "com.example.android.authenticatordemo.extra.EMAIL";
+	public static final int REQUEST_LOGIN = 1;
 
 	/**
 	 * Keep track of the login task to ensure we can cancel it if requested.
 	 */
 	private UserLoginTask mAuthTask = null;
 
-	// Values for email and password at the time of the login attempt.
-	private String mEmail;
+	// Values for user and password at the time of the login attempt.
+	private String mUser;
 	private String mPassword;
 
 	// UI references.
-	private EditText mEmailView;
+	private EditText mUserView;
 	private EditText mPasswordView;
 	private View mLoginFormView;
 	private View mLoginStatusView;
@@ -56,9 +53,8 @@ public class LoginActivity extends Activity {
 		setupActionBar();
 
 		// Set up the login form.
-		mEmail = getIntent().getStringExtra(EXTRA_EMAIL);
-		mEmailView = (EditText) findViewById(R.id.email);
-		mEmailView.setText(mEmail);
+		mUserView = (EditText) findViewById(R.id.user);
+		mUserView.setText(mUser);
 
 		mPasswordView = (EditText) findViewById(R.id.password);
 		mPasswordView
@@ -128,7 +124,7 @@ public class LoginActivity extends Activity {
 
 	/**
 	 * Attempts to sign in or register the account specified by the login form.
-	 * If there are form errors (invalid email, missing fields, etc.), the
+	 * If there are form errors (invalid user, missing fields, etc.), the
 	 * errors are presented and no actual login attempt is made.
 	 */
 	public void attemptLogin() {
@@ -138,11 +134,11 @@ public class LoginActivity extends Activity {
 		}
 
 		// Reset errors.
-		mEmailView.setError(null);
+		mUserView.setError(null);
 		mPasswordView.setError(null);
 
 		// Store values at the time of the login attempt.
-		mEmail = mEmailView.getText().toString();
+		mUser = mUserView.getText().toString();
 		mPassword = mPasswordView.getText().toString();
 
 		boolean cancel = false;
@@ -159,14 +155,10 @@ public class LoginActivity extends Activity {
 			cancel = true;
 		}
 
-		// Check for a valid email address.
-		if (TextUtils.isEmpty(mEmail)) {
-			mEmailView.setError(getString(R.string.error_field_required));
-			focusView = mEmailView;
-			cancel = true;
-		} else if (!mEmail.contains("@")) {
-			mEmailView.setError(getString(R.string.error_invalid_email));
-			focusView = mEmailView;
+		// Check for a valid user
+		if (TextUtils.isEmpty(mUser)) {
+			mUserView.setError(getString(R.string.error_field_required));
+			focusView = mUserView;
 			cancel = true;
 		}
 
@@ -234,20 +226,20 @@ public class LoginActivity extends Activity {
 		protected Boolean doInBackground(Void... params) {
 			L.i("UserLoginTask::doInBackground");
 			try {
-				ParseQuery<ParseUser> query = ParseUser.getQuery().whereEqualTo("user", mEmail);
+				ParseQuery<ParseUser> query = ParseUser.getQuery().whereEqualTo("username", mUser);
 				L.i("UserLoginTask::doInBackground 1");
 				ParseUser user = new ParseUser();
 				if (query.count() == 0) {
 					L.i("UserLoginTask::doInBackground 2");
-					user.setUsername(mEmail);
+					user.setUsername(mUser);
 					user.setPassword(mPassword);
 					user.signUp();
 				} else {
 					L.i("UserLoginTask::doInBackground 3");
-					user = ParseUser.logIn(mEmail, mPassword);
+					user = ParseUser.logIn(mUser, mPassword);
 				}
 				L.i("UserLoginTask::doInBackground 4");
-				L.i("User: %s,  Email: %s", user.getUsername().getBytes(), user.getEmail().getBytes());
+				L.i("User: %s,  Email: %s", user.getUsername(), user.getEmail());
 
 				return true;
 			} catch (ParseException e) {
@@ -262,6 +254,7 @@ public class LoginActivity extends Activity {
 			showProgress(false);
 
 			if (success) {
+				setResult(RESULT_OK);
 				finish();
 			} else {
 				mPasswordView
