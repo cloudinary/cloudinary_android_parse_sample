@@ -68,8 +68,8 @@ public class UploadPhotoActivity extends Activity {
 	}
 	
 	private void startUpload(String filePath) {
-		AsyncTask<String, Void, Void> task = new AsyncTask<String, Void, Void>() {
-			protected Void doInBackground(String... paths) {
+		AsyncTask<String, Void, Boolean> task = new AsyncTask<String, Void, Boolean>() {
+			protected Boolean doInBackground(String... paths) {
 				L.d("upload file");
 				// sign request
 				Map<String, String> result;
@@ -79,7 +79,7 @@ public class UploadPhotoActivity extends Activity {
 				} catch (ParseException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
-					return null;
+					return false;
 				}
 		
 				// Upload to cloudinary
@@ -92,24 +92,29 @@ public class UploadPhotoActivity extends Activity {
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
-					return null;
+					return false;
 				}
 		
 				// update parse
 				ParseObject photo = new ParseObject("Photo");
 				try {
-					photo.put("public_id", cloudinaryResult.getString("public_id"));
-					photo.put("format", cloudinaryResult.getString("format"));
+					photo.put("cloudinary_identifier", cloudinary.signedPreloadedImage(cloudinaryResult));
 					photo.save();
 			        L.d("Saved object");
 				} catch (JSONException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
+					return false;
 				} catch (ParseException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
+					return false;
 				}
-				return null;
+				return true;
+			}
+			protected void onPostExecute(Boolean success) {
+				// TODO: handle error better
+				finish();
 			}
 		};
 		L.d("Running async task");

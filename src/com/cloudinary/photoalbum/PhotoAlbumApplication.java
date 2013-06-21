@@ -7,6 +7,7 @@ import android.app.Application;
 import android.content.Context;
 
 import com.cloudinary.Cloudinary;
+import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 import com.nostra13.universalimageloader.utils.L;
 import com.parse.Parse;
@@ -31,7 +32,7 @@ public class PhotoAlbumApplication extends Application {
 	}
 
 	private void initUIL() {
-		ImageLoaderConfiguration.createDefault(this);
+		ImageLoader.getInstance().init(ImageLoaderConfiguration.createDefault(this));
 		L.i("Universal Image Loader initialized");
 	}
 
