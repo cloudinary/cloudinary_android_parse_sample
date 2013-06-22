@@ -14,6 +14,7 @@ import android.widget.GridView;
 import android.widget.ImageView;
 
 import com.cloudinary.Cloudinary;
+import com.cloudinary.Transformation;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.utils.L;
@@ -66,6 +67,7 @@ public class ListPhotosActivity extends Activity {
 		private ParseQuery<ParseObject> query = ParseQuery.getQuery("Photo");
 		private int cachePosition;
 		private List<ParseObject> cache = null;
+		private Transformation thumbnailTransformation = new Transformation().width(120).height(120).crop("fill");
 
 		private String getUrl(int index) throws ParseException {
 			int base = index-(index%ITEM_PER_FETCH);
@@ -83,7 +85,7 @@ public class ListPhotosActivity extends Activity {
 			L.i("Returning obj: %s for index %d", obj.toString(), index);
 			String identifier = obj.getString("cloudinary_identifier");
 			L.i("Returning identifier: %s for index %d", identifier, index);
-			String url = cloudinary.url().fromIdentifier(identifier).generate();
+			String url = cloudinary.url().fromIdentifier(identifier).transformation(thumbnailTransformation).generate();
 			L.i("Returning url: %s for index %d", url, index);
 			return url;
 		}
