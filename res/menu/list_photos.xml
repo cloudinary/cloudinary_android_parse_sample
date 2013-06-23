@@ -5,4 +5,10 @@
         android:showAsAction="never"
         android:title="@string/action_upload" android:checkable="false"/>
 
+    <item
+        android:id="@+id/action_refresh"
+        android:orderInCategory="200"
+        android:showAsAction="never"
+        android:title="@string/action_refresh" android:checkable="false"/>
+
 </menu>

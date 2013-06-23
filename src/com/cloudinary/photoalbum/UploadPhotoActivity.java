@@ -114,6 +114,9 @@ public class UploadPhotoActivity extends Activity {
 			}
 			protected void onPostExecute(Boolean success) {
 				// TODO: handle error better
+				if (success) {
+					setResult(RESULT_OK);
+				}
 				finish();
 			}
 		};
