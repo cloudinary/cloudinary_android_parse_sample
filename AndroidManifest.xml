@@ -5,7 +5,7 @@
     android:versionName="1.0" >
 
     <uses-sdk
-        android:minSdkVersion="8"
+        android:minSdkVersion="11"
         android:targetSdkVersion="17" />
 
     <uses-permission android:name="android.permission.INTERNET" />
@@ -48,6 +48,10 @@
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.cloudinary.photoalbum.ListPhotosActivity" />
+        </activity>
+        <activity
+            android:name="com.cloudinary.photoalbum.ShowPhotoActivity"
+            android:label="@string/title_activity_show_photo" >
         </activity>
     </application>
 

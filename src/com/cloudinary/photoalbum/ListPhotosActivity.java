@@ -9,13 +9,14 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.BaseAdapter;
 import android.widget.GridView;
 import android.widget.ImageView;
 
 import com.cloudinary.Cloudinary;
 import com.cloudinary.Transformation;
-import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.utils.L;
 import com.parse.ParseException;
@@ -25,7 +26,6 @@ import com.parse.ParseQuery;
 public class ListPhotosActivity extends Activity {
 	protected Cloudinary cloudinary;
 	protected ImageLoader imageLoader = ImageLoader.getInstance();
-	protected DisplayImageOptions options;
 	protected ParseImageAdapter adapter;
 	protected GridView listView;
 
@@ -37,11 +37,29 @@ public class ListPhotosActivity extends Activity {
 		listView = (GridView) findViewById(R.id.gridView1);
 		adapter = new ParseImageAdapter();
 		listView.setAdapter(adapter);
+		listView.setOnItemClickListener(new OnItemClickListener() {
+			@Override
+			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+				try {
+					showImage(adapter.getIdentifier(position));
+				} catch (ParseException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+
+			}
+		});
+	}
+
+	private void showImage(String identifier) {
+		Intent intent = new Intent(this, ShowPhotoActivity.class);
+		intent.putExtra("com.cloudinary.photo", identifier);
+		startActivity(intent);
 	}
 
 	@Override
-	protected void onResume() {
-		super.onResume();
+	protected void onRestart() {
+		super.onRestart();
 		adapter.clearCache();
 	}
 
@@ -69,9 +87,9 @@ public class ListPhotosActivity extends Activity {
 		private List<ParseObject> cache = null;
 		private Transformation thumbnailTransformation = new Transformation().width(120).height(120).crop("fill");
 
-		private String getUrl(int index) throws ParseException {
+		private String getIdentifier(int index) throws ParseException {
 			int base = index-(index%ITEM_PER_FETCH);
-			L.i("getUrl for index %d", index);
+			L.i("getIdentifier for index %d", index);
 			if (cache == null || cachePosition != base) {
 				L.i("Fetching %d items since %d", ITEM_PER_FETCH, base);
 				query.setSkip(base);
@@ -85,6 +103,11 @@ public class ListPhotosActivity extends Activity {
 			L.i("Returning obj: %s for index %d", obj.toString(), index);
 			String identifier = obj.getString("cloudinary_identifier");
 			L.i("Returning identifier: %s for index %d", identifier, index);
+			return identifier;
+		}
+
+		private String getUrl(int index) throws ParseException {
+			String identifier = getIdentifier(index);
 			String url = cloudinary.url().fromIdentifier(identifier).transformation(thumbnailTransformation).generate();
 			L.i("Returning url: %s for index %d", url, index);
 			return url;
@@ -132,7 +155,7 @@ public class ListPhotosActivity extends Activity {
 			}
 
 			try {
-				imageLoader.displayImage(getUrl(position), imageView, options);
+				imageLoader.displayImage(getUrl(position), imageView);
 			} catch (ParseException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
