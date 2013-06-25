@@ -16,7 +16,6 @@ import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.TextView;
 
 import com.cloudinary.Cloudinary;
 import com.cloudinary.Transformation;
@@ -98,7 +97,6 @@ public class ShowPhotoActivity extends FragmentActivity {
 			Cloudinary cloudinary = PhotoAlbumApplication.getInstance(context).getCloudinary();
 			Pair<String, Transformation> transformation = transformations.get(position);
 			String url = cloudinary.url().fromIdentifier(cloudinaryIdentifier).transformation(transformation.second).generate();
-			args.putString(DummySectionFragment.ARG_TITLE, transformation.first);
 			args.putString(DummySectionFragment.ARG_URL, url);
 			fragment.setArguments(args);
 			return fragment;
@@ -126,7 +124,6 @@ public class ShowPhotoActivity extends FragmentActivity {
 		 * The fragment argument representing the section number for this
 		 * fragment.
 		 */
-		public static final String ARG_TITLE = "title";
 		public static final String ARG_URL = "url";
 
 		public DummySectionFragment() {
@@ -137,9 +134,6 @@ public class ShowPhotoActivity extends FragmentActivity {
 				Bundle savedInstanceState) {
 			View rootView = inflater.inflate(
 					R.layout.fragment_show_photo, container, false);
-
-			TextView textView = (TextView) rootView.findViewById(R.id.section_label);
-			textView.setText(getArguments().getString(ARG_TITLE));
 
 			ImageView imageView = (ImageView) rootView.findViewById(R.id.image);
 			ImageLoader.getInstance().displayImage(getArguments().getString(ARG_URL), imageView);
