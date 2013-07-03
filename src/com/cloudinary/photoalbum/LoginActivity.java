@@ -4,6 +4,8 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
 import android.app.Activity;
+import android.content.Context;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
@@ -32,6 +34,8 @@ public class LoginActivity extends Activity {
 	 */
 	private UserLoginTask mAuthTask = null;
 
+	private Context mContext = this;
+	
 	// Values for user and password at the time of the login attempt.
 	private String mUser;
 	private String mPassword;
@@ -252,8 +256,9 @@ public class LoginActivity extends Activity {
 			showProgress(false);
 
 			if (success) {
-				setResult(RESULT_OK);
-				finish();
+				Intent intent = new Intent(mContext, ListPhotosActivity.class);
+				intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+				startActivity(intent);
 			} else {
 				mPasswordView
 						.setError(getString(R.string.error_incorrect_password));

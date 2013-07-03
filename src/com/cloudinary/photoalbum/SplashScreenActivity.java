@@ -19,7 +19,6 @@ import com.nostra13.universalimageloader.utils.L;
  * @see SystemUiHider
  */
 public class SplashScreenActivity extends Activity {
-	private static final int REQUEST_DEFAULT = 1;
 	/**
 	 * The next activity to fire
 	 */
@@ -126,11 +125,6 @@ public class SplashScreenActivity extends Activity {
 		findViewById(R.id.dummy_button).setOnTouchListener(
 				mDelayHideTouchListener);
 		
-	}
-
-	@Override
-	protected void onResume() {
-		super.onResume();
 		scheduleRedirect();
 	}
 
@@ -142,18 +136,10 @@ public class SplashScreenActivity extends Activity {
 			public void run() {
 				L.i("Calling new intent - %s", nextActivity.toString());
 				Intent intent = new Intent(current, nextActivity);
-				startActivityForResult(intent, REQUEST_DEFAULT);
+				intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+				startActivity(intent);
 			}
 		}, SPLASH_SCREEN_TIMEOUT);
-	}
-	
-	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-		L.d("SplashScreenActivity - %d %d", requestCode, resultCode);
-		if (requestCode == REQUEST_DEFAULT) {
-			if (resultCode == RESULT_OK) {
-				nextActivity = ListPhotosActivity.class;
-			}
-		}
 	}
 
 	@Override

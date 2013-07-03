@@ -76,13 +76,19 @@ public class ListPhotosActivity extends Activity {
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
+		Intent intent;
 		switch (item.getItemId()) {
 		case R.id.action_upload:
-			Intent intent = new Intent(this, UploadPhotoActivity.class);
+			intent = new Intent(this, UploadPhotoActivity.class);
 			startActivityForResult(intent, REQUEST_UPLOAD);
 			break;
 		case R.id.action_refresh:
 			adapter.clearCache();
+			break;
+		case R.id.action_logout:
+			intent = new Intent(this, LoginActivity.class);
+			intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+			startActivity(intent);
 			break;
 		}
 		return false;
