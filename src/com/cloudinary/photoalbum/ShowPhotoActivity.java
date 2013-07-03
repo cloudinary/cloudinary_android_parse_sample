@@ -12,7 +12,6 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.util.Pair;
 import android.view.LayoutInflater;
-import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -67,13 +66,6 @@ public class ShowPhotoActivity extends FragmentActivity {
 		cloudinaryIdentifier = bundle.getString("com.cloudinary.photo");
 
 		context = this;
-	}
-
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.show_photo, menu);
-		return true;
 	}
 
 	/**
