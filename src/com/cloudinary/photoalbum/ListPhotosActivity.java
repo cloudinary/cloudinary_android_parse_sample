@@ -111,6 +111,7 @@ public class ListPhotosActivity extends Activity {
 		}
 
 		private String getIdentifier(int index) throws ParseException {
+			index = getCount() - 1 - index;
 			int base = index-(index%ITEM_PER_FETCH);
 			L.i("getIdentifier for index %d", index);
 			if (cache == null || cachePosition != base) {
