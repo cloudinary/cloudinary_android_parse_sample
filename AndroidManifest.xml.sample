@@ -17,6 +17,12 @@
         android:icon="@drawable/cloudinary_icon"
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
+
+        <!-- Fill in Cloudinary and Parse identifiers here -->
+        <meta-data android:name="CLOUDINARY_URL" android:value="cloudinary://MY-CLOUD-NAME"/>
+        <meta-data android:name="PARSE_APPLICATION_ID" android:value="MY-APP-ID"/>
+        <meta-data android:name="PARSE_CLIENT_KEY" android:value="MY-CLIENT-KEY"/>
+
         <activity
             android:name="com.cloudinary.photoalbum.SplashScreenActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"

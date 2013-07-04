@@ -1,10 +1,10 @@
 package com.cloudinary.photoalbum;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import android.app.Application;
 import android.content.Context;
+import android.content.pm.PackageManager;
+import android.content.pm.PackageManager.NameNotFoundException;
+import android.os.Bundle;
 
 import com.cloudinary.Cloudinary;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
@@ -45,7 +45,24 @@ public class PhotoAlbumApplication extends Application {
 	}
 
 	private void initParse() {
-		Parse.initialize(this, "PARSE-APP-ID", "PARSE-CLIENT-KEY");
+		String appId = null;
+		String clientKey = null;
+
+		try {
+			Bundle bundle = getPackageManager()
+					.getApplicationInfo( getPackageName(), PackageManager.GET_META_DATA)
+					.metaData;
+			appId = bundle.getString("PARSE_APPLICATION_ID");
+			clientKey = bundle.getString("PARSE_CLIENT_KEY");
+		} catch (NameNotFoundException e) {
+			// fall-thru
+		} catch (NullPointerException e) {
+			// fall-thru
+		}
+		if (appId == null || clientKey == null) {
+			throw new RuntimeException("Couldn't load Parse meta-data params from manifest");
+		}
+		Parse.initialize(this, appId, clientKey);
 
 		ParseUser.enableAutomaticUser();
 		ParseACL defaultACL = new ParseACL();
@@ -54,9 +71,6 @@ public class PhotoAlbumApplication extends Application {
 	}
 	
 	private void initCloudinary() {
-		Map<String, String> config = new HashMap<String, String>();
-		config.put("cloud_name", "CLOUDINARY-CLOUD-NAME");
-		config.put("api_key", "CLOUDINARY-API-KEY");
-		cloudinary = new Cloudinary(config);
+		cloudinary = new Cloudinary(this);
 	}
 }
