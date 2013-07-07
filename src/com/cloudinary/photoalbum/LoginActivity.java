@@ -16,8 +16,11 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.cloudinary.Cloudinary;
+import com.cloudinary.Transformation;
 import com.nostra13.universalimageloader.utils.L;
 import com.parse.ParseException;
 import com.parse.ParseQuery;
@@ -52,6 +55,8 @@ public class LoginActivity extends Activity {
 
 		setContentView(R.layout.activity_login);
 		setupActionBar();
+		
+		setupImage();
 
 		// Set up the login form.
 		mUserView = (EditText) findViewById(R.id.user);
@@ -84,6 +89,16 @@ public class LoginActivity extends Activity {
 				});
 
 		L.i("LoginActivity - created");
+	}
+	
+	void setupImage() {
+		Cloudinary cloudinary = PhotoAlbumApplication.getInstance(this).getCloudinary();
+		String url = cloudinary.url().type("facebook").transformation(
+			new Transformation().height(95).width(95).crop("thumb").gravity("face").effect("sepia").radius(20)
+			.chain().angle(10)
+		).format("png").generate("officialchucknorrispage");
+		new DownloadImageTask((ImageView) findViewById(R.id.logo))
+            .execute(url);
 	}
 
 	/**
