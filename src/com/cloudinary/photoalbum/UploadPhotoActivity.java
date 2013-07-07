@@ -24,7 +24,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import com.cloudinary.Cloudinary;
-import com.nostra13.universalimageloader.utils.L;
 import com.parse.ParseCloud;
 import com.parse.ParseException;
 import com.parse.ParseObject;
@@ -74,14 +73,17 @@ public class UploadPhotoActivity extends Activity {
 	private void startUpload(String filePath) {
 		AsyncTask<String, Void, String> task = new AsyncTask<String, Void, String>() {
 			protected String doInBackground(String... paths) {
-				L.d("upload file");
+				L.d("Running upload task");
+
 				// sign request
-				Map<String, String> result;
+				Map<String, String> uploadParams;
 				try {
-					result = ParseCloud.callFunction("sign_upload_request", null);
-			        L.d("Signed request: %s", result.toString());
+					// Parse+Cloudinary: retrieves a Cloudinary signature and upload params using the Parse cloud function.
+					//   see https://github.com/cloudinary/cloudinary_parse
+					uploadParams = ParseCloud.callFunction(Constants.PARSE_SIGN_CLOUD_FUNCTION, null);
+			        L.i("Signed request: %s", uploadParams.toString());
 				} catch (ParseException e) {
-					e.printStackTrace();
+			        L.e(e, "Error signing request");
 					return "Error signing request: " + e.toString();
 				}
 		
@@ -90,31 +92,36 @@ public class UploadPhotoActivity extends Activity {
 				File file = new File(paths[0]);
 				JSONObject cloudinaryResult;
 				try {
-					cloudinaryResult = cloudinary.uploader().upload(file, result);
-			        L.d("Uploaded file: %s", cloudinaryResult.toString());
+					// Cloudinary: Upload file using the retrieved signature and upload params
+					cloudinaryResult = cloudinary.uploader().upload(file, uploadParams);
+			        L.i("Uploaded file: %s", cloudinaryResult.toString());
 				} catch (RuntimeException e) {
-					e.printStackTrace();
+			        L.e(e, "Error uploading file");
 					return "Error uploading file: " + e.toString();
 				} catch (IOException e) {
-					e.printStackTrace();
+			        L.e(e, "Error uploading file");
 					return "Error uploading file: " + e.toString();
 				}
 		
 				// update parse
 				ParseObject photo = new ParseObject("Photo");
 				try {
+					// Parse+Cloudinary: Save a reference to the uploaded image in Parse backend. The
+					//   field may be verified using the beforeSave filter demonstrated in:
+					//   https://github.com/cloudinary/cloudinary_parse
 					photo.put("cloudinary_identifier", cloudinary.signedPreloadedImage(cloudinaryResult));
 					photo.save();
-			        L.d("Saved object");
+			        L.i("Saved object");
 				} catch (JSONException e) {
-					e.printStackTrace();
+			        L.e(e, "Error saving object");
 					return "Error saving object: " + e.toString();
 				} catch (ParseException e) {
-					e.printStackTrace();
+			        L.e(e, "Error saving object");
 					return "Error saving object: " + e.toString();
 				}
 				return null;
 			}
+
 			protected void onPostExecute(String error) {
 				if (dialog != null) {
 					dialog.dismiss();
@@ -137,7 +144,6 @@ public class UploadPhotoActivity extends Activity {
 				}
 			}
 		};
-		L.d("Running async task");
 		dialog = ProgressDialog.show(this, "Uploading", "Uploading image");
 		task.execute(filePath);
 	}

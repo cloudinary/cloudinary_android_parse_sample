@@ -3,6 +3,8 @@ package com.cloudinary.photoalbum;
 import java.util.List;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
@@ -18,7 +20,6 @@ import android.widget.ImageView;
 import com.cloudinary.Cloudinary;
 import com.cloudinary.Transformation;
 import com.nostra13.universalimageloader.core.ImageLoader;
-import com.nostra13.universalimageloader.utils.L;
 import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
@@ -35,7 +36,10 @@ public class ListPhotosActivity extends Activity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+
+		// Cloudinary: Retrieve and save initialized Cloudinary instance
 		cloudinary = PhotoAlbumApplication.getInstance(this).getCloudinary();
+
 		setContentView(R.layout.activity_list_photos);
 		listView = (GridView) findViewById(R.id.gridView1);
 		adapter = new ParseImageAdapter();
@@ -46,17 +50,30 @@ public class ListPhotosActivity extends Activity {
 				try {
 					showImage(adapter.getIdentifier(position));
 				} catch (ParseException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+			        L.e(e, "Error getting identifier");
+					errorMessage("Error getting identifier for image to show transformations: " + e.toString());
 				}
 
 			}
 		});
 	}
 
+	private void errorMessage(String errorMessage) {
+		new AlertDialog.Builder(this)
+			.setTitle("Error")
+			.setMessage(errorMessage)
+			.setPositiveButton("OK",new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int whichButton) {
+					finish();
+				}
+			})
+			.setCancelable(true)
+			.create().show();
+	}
+
 	private void showImage(String identifier) {
 		Intent intent = new Intent(this, ShowPhotoActivity.class);
-		intent.putExtra("com.cloudinary.photo", identifier);
+		intent.putExtra(Constants.EXTRA_PHOTO, identifier);
 		startActivity(intent);
 	}
 
@@ -106,40 +123,38 @@ public class ListPhotosActivity extends Activity {
 		}
 
 		private void createQuery() {
-			query = ParseQuery.getQuery("Photo");
+			// Parse: Create a query for model Photo and set caching options
+			query = ParseQuery.getQuery(Constants.PARSE_MODEL);
 			query.setCachePolicy(CachePolicy.CACHE_ELSE_NETWORK);
 		}
 
 		private String getIdentifier(int index) throws ParseException {
 			index = getCount() - 1 - index;
 			int base = index-(index%ITEM_PER_FETCH);
-			L.i("getIdentifier for index %d", index);
 			if (cache == null || cachePosition != base) {
-				L.i("Fetching %d items since %d", ITEM_PER_FETCH, base);
+				L.d("Fetching %d items since %d", ITEM_PER_FETCH, base);
+				// Parse: Fetch ITEM_PER_FETCH items since index "base"
 				query.setSkip(base);
 				query.setLimit(ITEM_PER_FETCH);
 				cache = query.find();
 				cachePosition = base;
-				L.i("Done");
-				L.i("cache: %s", cache);
-				L.i("Done");
 			}
-			ParseObject obj = cache.get(index % ITEM_PER_FETCH);
-			L.i("Returning obj: %s for index %d", obj.toString(), index);
-			String identifier = obj.getString("cloudinary_identifier");
-			L.i("Returning identifier: %s for index %d", identifier, index);
+			// Parse: Get identifier field from parse object
+			ParseObject photo = cache.get(index % ITEM_PER_FETCH);
+			String identifier = photo.getString(Constants.PARSE_CLOUDINARY_FIELD);
+			L.d("Returning identifier: %s for index %d", identifier, index);
 			return identifier;
 		}
 
 		private String getUrl(int index) throws ParseException {
 			String identifier = getIdentifier(index);
+			// Cloudinary: generate a URL reflecting the thumbnail transformation on the given identifier.
 			String url = cloudinary.url().fromIdentifier(identifier).transformation(thumbnailTransformation).generate();
-			L.i("Returning url: %s for index %d", url, index);
 			return url;
 		}
 
 		private void clearCache() {
-			L.i("Clearing cache. Cache policy: %s", query.getCachePolicy().toString());
+			L.d("Clearing cache. Cache policy: %s", query.getCachePolicy().toString());
 			cache = null;
 			ParseQuery.clearAllCachedResults();
 			createQuery();
@@ -151,12 +166,9 @@ public class ListPhotosActivity extends Activity {
 		public int getCount() {
 			try {
 				int count;
-				L.i("Counting");
 				count = query.count();
-				L.i("Done: %d", count);
 				return count;
 			} catch (ParseException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 				throw new RuntimeException("Can't query object count");
 			}
@@ -184,8 +196,8 @@ public class ListPhotosActivity extends Activity {
 			try {
 				imageLoader.displayImage(getUrl(position), imageView);
 			} catch (ParseException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+		        L.e(e, "Error getting identifier");
+				errorMessage("Error getting identifier for image to show in list: " + e.toString());
 			}
 
 			return imageView;

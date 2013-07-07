@@ -21,7 +21,6 @@ import android.widget.TextView;
 
 import com.cloudinary.Cloudinary;
 import com.cloudinary.Transformation;
-import com.nostra13.universalimageloader.utils.L;
 import com.parse.ParseException;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
@@ -87,8 +86,6 @@ public class LoginActivity extends Activity {
 						attemptLogin();
 					}
 				});
-
-		L.i("LoginActivity - created");
 	}
 	
 	void setupImage() {
@@ -123,8 +120,6 @@ public class LoginActivity extends Activity {
 			//
 			// http://developer.android.com/design/patterns/navigation.html#up-vs-back
 			//
-			// TODO: If Settings has multiple levels, Up should navigate up
-			// that hierarchy.
 			NavUtils.navigateUpFromSameTask(this);
 			return true;
 		}
@@ -137,7 +132,6 @@ public class LoginActivity extends Activity {
 	 * errors are presented and no actual login attempt is made.
 	 */
 	public void attemptLogin() {
-		L.i("attemptLogin");
 		if (mAuthTask != null) {
 			return;
 		}
@@ -233,26 +227,28 @@ public class LoginActivity extends Activity {
 	public class UserLoginTask extends AsyncTask<Void, Void, Boolean> {
 		@Override
 		protected Boolean doInBackground(Void... params) {
-			L.i("UserLoginTask::doInBackground");
+			ParseUser user;
 			try {
+				// Parse: Look up given user
+				L.d("UserLoginTask::doInBackground - checking if user '%s' exists", mUser);
 				ParseQuery<ParseUser> query = ParseUser.getQuery().whereEqualTo("username", mUser);
-				L.i("UserLoginTask::doInBackground 1");
-				ParseUser user = new ParseUser();
 				if (query.count() == 0) {
-					L.i("UserLoginTask::doInBackground 2");
+					L.i("UserLoginTask::doInBackground - doesn't exist - signing up");
+					// Parse: User doesn't exist - create
+					user = new ParseUser();
 					user.setUsername(mUser);
 					user.setPassword(mPassword);
 					user.signUp();
 				} else {
-					L.i("UserLoginTask::doInBackground 3");
+					L.d("UserLoginTask::doInBackground - exists - verifying password");
+					// Parse: User exists - verify password
 					user = ParseUser.logIn(mUser, mPassword);
 				}
-				L.i("UserLoginTask::doInBackground 4");
-				L.i("User: %s,  Email: %s", user.getUsername(), user.getEmail());
+				L.d("UserLoginTask::doInBackground - done!");
 
 				return true;
 			} catch (ParseException e) {
-				L.e(e);
+				L.e(e, "Authentication error");
 				return false;
 			}
 		}

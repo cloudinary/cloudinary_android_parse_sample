@@ -38,6 +38,10 @@ public class ShowPhotoActivity extends FragmentActivity {
 
 	Context context;
 	String cloudinaryIdentifier;
+
+	/**
+	 * Cloudinary: List of transformations and names to display
+	 */
 	@SuppressWarnings("serial")
 	static ArrayList<Pair<String, Transformation>> transformations = new ArrayList<Pair<String, Transformation>>() {{
 		add(new Pair<String, Transformation>("Original", new Transformation()));
@@ -63,7 +67,7 @@ public class ShowPhotoActivity extends FragmentActivity {
 		mViewPager.setAdapter(mSectionsPagerAdapter);
 
 		Bundle bundle = getIntent().getExtras();
-		cloudinaryIdentifier = bundle.getString("com.cloudinary.photo");
+		cloudinaryIdentifier = bundle.getString(Constants.EXTRA_PHOTO);
 
 		context = this;
 	}
@@ -83,13 +87,14 @@ public class ShowPhotoActivity extends FragmentActivity {
 			// getItem is called to instantiate the fragment for the given page.
 			// Return a DummySectionFragment (defined as a static inner class
 			// below) with the page number as its lone argument.
-			Fragment fragment = new DummySectionFragment();
+			Fragment fragment = new ImageByURLSectionFragment();
 			Bundle args = new Bundle();
 
 			Cloudinary cloudinary = PhotoAlbumApplication.getInstance(context).getCloudinary();
 			Pair<String, Transformation> transformation = transformations.get(position);
+			// Cloudinary: generate a URL reflecting the given transformation on the given identifier.
 			String url = cloudinary.url().fromIdentifier(cloudinaryIdentifier).transformation(transformation.second).generate();
-			args.putString(DummySectionFragment.ARG_URL, url);
+			args.putString(ImageByURLSectionFragment.ARG_URL, url);
 			fragment.setArguments(args);
 			return fragment;
 		}
@@ -108,17 +113,17 @@ public class ShowPhotoActivity extends FragmentActivity {
 	}
 
 	/**
-	 * A dummy fragment representing a section of the app, but that simply
-	 * displays dummy text.
+	 * A fragment representing a section of the app
+	 * displays an image
 	 */
-	public static class DummySectionFragment extends Fragment {
+	public static class ImageByURLSectionFragment extends Fragment {
 		/**
 		 * The fragment argument representing the section number for this
 		 * fragment.
 		 */
 		public static final String ARG_URL = "url";
 
-		public DummySectionFragment() {
+		public ImageByURLSectionFragment() {
 		}
 
 		@Override
