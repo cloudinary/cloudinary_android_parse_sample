@@ -119,6 +119,7 @@ public class ListPhotosActivity extends Activity {
 				query.setSkip(base);
 				query.setLimit(ITEM_PER_FETCH);
 				cache = query.find();
+				cachePosition = base;
 				L.i("Done");
 				L.i("cache: %s", cache);
 				L.i("Done");

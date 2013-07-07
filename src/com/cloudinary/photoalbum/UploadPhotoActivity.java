@@ -9,6 +9,9 @@ import org.json.JSONObject;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
@@ -29,6 +32,7 @@ import com.parse.ParseObject;
 public class UploadPhotoActivity extends Activity {
 	private final static int SELECT_PICTURE = 1;
 	private final Activity current = this;
+	private ProgressDialog dialog = null;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -68,8 +72,8 @@ public class UploadPhotoActivity extends Activity {
 	}
 	
 	private void startUpload(String filePath) {
-		AsyncTask<String, Void, Boolean> task = new AsyncTask<String, Void, Boolean>() {
-			protected Boolean doInBackground(String... paths) {
+		AsyncTask<String, Void, String> task = new AsyncTask<String, Void, String>() {
+			protected String doInBackground(String... paths) {
 				L.d("upload file");
 				// sign request
 				Map<String, String> result;
@@ -77,9 +81,8 @@ public class UploadPhotoActivity extends Activity {
 					result = ParseCloud.callFunction("sign_upload_request", null);
 			        L.d("Signed request: %s", result.toString());
 				} catch (ParseException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
-					return false;
+					return "Error signing request: " + e.toString();
 				}
 		
 				// Upload to cloudinary
@@ -89,10 +92,12 @@ public class UploadPhotoActivity extends Activity {
 				try {
 					cloudinaryResult = cloudinary.uploader().upload(file, result);
 			        L.d("Uploaded file: %s", cloudinaryResult.toString());
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
+				} catch (RuntimeException e) {
 					e.printStackTrace();
-					return false;
+					return "Error uploading file: " + e.toString();
+				} catch (IOException e) {
+					e.printStackTrace();
+					return "Error uploading file: " + e.toString();
 				}
 		
 				// update parse
@@ -102,25 +107,38 @@ public class UploadPhotoActivity extends Activity {
 					photo.save();
 			        L.d("Saved object");
 				} catch (JSONException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
-					return false;
+					return "Error saving object: " + e.toString();
 				} catch (ParseException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
-					return false;
+					return "Error saving object: " + e.toString();
 				}
-				return true;
+				return null;
 			}
-			protected void onPostExecute(Boolean success) {
-				// TODO: handle error better
-				if (success) {
-					setResult(RESULT_OK);
+			protected void onPostExecute(String error) {
+				if (dialog != null) {
+					dialog.dismiss();
+					dialog = null;
 				}
-				finish();
+				if (error == null) {
+					setResult(RESULT_OK);
+					finish();
+				} else {
+					new AlertDialog.Builder(current)
+						.setTitle("Error")
+						.setMessage(error)
+						.setPositiveButton("OK",new DialogInterface.OnClickListener() {
+							public void onClick(DialogInterface dialog, int whichButton) {
+								finish();
+							}
+						})
+						.setCancelable(true)
+						.create().show();
+				}
 			}
 		};
 		L.d("Running async task");
+		dialog = ProgressDialog.show(this, "Uploading", "Uploading image");
 		task.execute(filePath);
 	}
 
