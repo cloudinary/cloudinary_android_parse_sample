@@ -109,7 +109,7 @@ public class UploadPhotoActivity extends Activity {
 					// Parse+Cloudinary: Save a reference to the uploaded image in Parse backend. The
 					//   field may be verified using the beforeSave filter demonstrated in:
 					//   https://github.com/cloudinary/cloudinary_parse
-					photo.put("cloudinary_identifier", cloudinary.signedPreloadedImage(cloudinaryResult));
+					photo.put(Constants.PARSE_CLOUDINARY_FIELD, cloudinary.signedPreloadedImage(cloudinaryResult));
 					photo.save();
 			        L.i("Saved object");
 				} catch (JSONException e) {
