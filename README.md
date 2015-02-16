@@ -14,11 +14,11 @@ For more details about **Parse**: https://www.parse.com/
 ## Setup and run the sample project
 
 * [Setup the Parse backend in 7 simple steps](https://github.com/cloudinary/cloudinary_parse#setup-the-sample-project)
-* Setup a working [eclipse](http://www.eclipse.org/downloads/) with android [SDK](http://developer.android.com/sdk/index.html) and [ADT](http://developer.android.com/sdk/installing/installing-adt.html) environment.
-* Clone or [download](https://github.com/cloudinary/cloudinary-android-parse-sample/archive/master.zip) this repository into your eclipse workspace
+* Setup a working [Android Studio](http://developer.android.com/sdk/index.html).
+* Clone or [download](https://github.com/cloudinary/cloudinary-android-parse-sample/archive/master.zip) this repository
 * Copy the `AndroidManifest.xml.sample` file into `AndroidManifest.xml` and modify the meta-data fields within it to reflect your Cloudinary cloud name and your Parse Application ID and Client Key.
-* Import your project (File -> Import -> General -> Existing Project into Workspace -> Select root directory -> Browse -> [Choose the cloudinary-android-parse-sample path])
-* Run the application on an Android device or a simulator (Run -> Run As -> Android Application -> [Choose device to run on])
+* Import your project (from Android Studio welcome screen > "Open an existing Android Studio project" -> [Choose the cloudinary-android-parse-sample path])
+* Run the application on an Android device or a simulator (Run -> Run 'App' -> [Choose device to run on])
 
 ## How does it work
 The application is composed of 5 android activities (`SplashScreenActivity`, `LoginActivity`, `ListPhotoActivity`, `ShowPhotoActivity` and `UploadPhotoActivity`), the application singleton (`PhotoAlbumApplication`), a few helper classes and a few external libraries.
@@ -72,13 +72,13 @@ A simple but useful AsyncTask which fetches an image by given URL into a given I
 Logging helper class
 
 ### Libraries
-#### cloudinaryandroid-1.0.1-parse.jar
+#### cloudinary-android:1.1.2 (*gradle)
 The Cloudinary library used to upload and retrieve Cloudinary images
 
-#### Parse-1.3.1.jar
+#### Parse-1.8.1.jar
 The Parse library used for user management (sign-up, login), and image objects management (add, list, fetch)
 
-#### universal-image-loader-1.8.5
+#### universalimageloader:universal-image-loader:1.9.3 (*gradle)
 A very comprehensive and flexible library for ["asynchronous image loading, caching and displaying"](https://github.com/nostra13/Android-Universal-Image-Loader#-universal-image-loader-for-android)
 
 ## Read more
