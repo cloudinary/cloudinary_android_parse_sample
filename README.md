@@ -50,7 +50,7 @@ Displays an endless list of uploaded images. The list is fetched from Parse by q
 When an image is clicked, the `ShowPhotoActivity` is launched passing it the image identifier in the intent extra parameters.  
 This activity also has a menu with upload, refresh and logout actions.
 
-Based partially on [ImageGridActivity.java](https://github.com/nostra13/Android-Universal-Image-Loader/blob/master/sample/src/com/nostra13/example/universalimageloader/ImageGridActivity.java) from Universal Image Loader
+Based partially on [ImageGridActivity.java](https://github.com/nostra13/Android-Universal-Image-Loader/blob/v1.9.2/sample/src/com/nostra13/example/universalimageloader/ImageGridActivity.java) from Universal Image Loader
 
 #### ShowPhotoActivity.java
 Displays a slidable pager with different transformations of the selected photo.
