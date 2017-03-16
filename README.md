@@ -1,3 +1,6 @@
+:warning: Following [Parse's end of service notification](http://blog.parse.com/announcements/moving-on/), this repo is deprecated and is not supported. The issues section won't be available.
+
+
 Cloudinary, Android and Parse - Photo Album sample
 ==================================================
 
